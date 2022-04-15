@@ -1,7 +1,4 @@
 # Brome
-<<<<<<< HEAD
-Chrome but better. Very small and fast browser for developers. Runs on Windows, Linux and Mac.
-=======
 Chrome but better: Brome. The most minimal and private browser, for people that want
 the best browsing experience. Runs on Windows, Mac and Linux (+ distros). 
 Download the latest release from [here](TODO).
@@ -16,4 +13,3 @@ website content. Thats why Brome has the smallest top bar possible and runs in t
 - Chrome is good, but sometimes opening a new tab and searching for something takes longer than necessary. Thats why
 Brome is always accessible via the shortcut CRTL/COMMAND + SHIFT + B or by clicking the Brome icon in the system tray.
 It also auto-fills your search bar with the previously copied text.
->>>>>>> first
