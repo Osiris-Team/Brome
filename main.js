@@ -1,30 +1,33 @@
+try {
+  require('electron-reloader')(module)
+} catch (_) {}
 // Modules to control application life and create native browser window
 const {app, BrowserWindow, screen, ipcMain, ipcRenderer, globalShortcut} = require('electron')
 const path = require('path')
 const TrayHelper = require('./tray-helper')
 let { searchEngineURL } = require('./global-data')
+let { setupTitlebar, attachTitlebarToWindow } = require("custom-electron-titlebar/main");
 
 let bromeWindow;
 let bromeWidth;
 let bromeHeight;
+let screenWidth, screenHeight;
 let childWindows = [];
 
 // CHILD-WINDOW
 function createChildWindow(url) {
   console.log("Creating child window: "+url)
-  const primaryDisplay = screen.getPrimaryDisplay()
-  const { width, height } = primaryDisplay.workAreaSize
   // Create the browser window.
   let childWindow = new BrowserWindow({
-    width: width,
-    height: height,
+    width: screenWidth,
+    height: screenHeight,
     backgroundColor: '#FFF',
     webPreferences: {
       preload: path.join(__dirname, 'child-preload.js'),
-      nodeIntegration: true
     },
-    parent: bromeWindow
+    frame: false
   })
+  attachTitlebarToWindow(childWindow);
   let index = childWindows.length;
   childWindows[index] = childWindow;
 
@@ -48,10 +51,15 @@ app.whenReady().then(() => {
   console.log("Activating shortcut listener...")
   initShortcutListener()
   console.log("Success!")
+  console.log("Creating title bar...")
+  setupTitlebar();
+  console.log("Success!")
 
   console.log("Creating main Brome window...")
   const primaryDisplay = screen.getPrimaryDisplay()
   const { width, height } = primaryDisplay.workAreaSize
+  screenWidth = width
+  screenHeight = height
   // Create the browser window.
   bromeHeight = parseInt(height / 100 * 20, 10);// to get 20% of the screen height: height / 100 * 2 // parseInt because double not supported
   bromeWidth = parseInt(width / 100 * 40, 10);// to get 40% of the screen width
@@ -68,12 +76,12 @@ app.whenReady().then(() => {
     backgroundColor: '#00FFFFFF',
     webPreferences: {
       preload: path.join(__dirname, 'brome-preload.js'),
-      nodeIntegration: true
     },
     transparent: true
   })
   bromeWindow.setAlwaysOnTop(true)
   bromeWindow.loadFile('brome.html')
+  bromeWindow.webContents.openDevTools({ mode: 'detach' });
 
   console.log("Brome with " + bromeWidth + "px width " + bromeHeight + "px height")
   console.log("Success!")

@@ -1,3 +1,10 @@
+// UTIL METHODS
+
+function endsWith(str, suffix) {
+    if(str==null) return false;
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
 
 // When document has loaded, initialise
 document.onreadystatechange = (event) => {
@@ -31,8 +38,8 @@ document.onreadystatechange = (event) => {
 function initBottomTabMenu() {
     const body = document.body;
     const tabs = body.querySelector("tabs")
-    const tabSelectors = menu.querySelectorAll("tab-select");
-    let activeItem = menu.querySelector(".active");
+    const tabSelectors = body.querySelectorAll("tab-select");
+    let activeItem = body.querySelector(".active");
 
     function clickItem(item, index) {
 
@@ -58,55 +65,27 @@ function initBottomTabMenu() {
 
 
 function initWindowControls() {
-    // Make minimise/maximise/restore/close buttons work when they are clicked
-    document.getElementById('min-button').addEventListener("click", event => {
-        window.electron.winMinimize()
-    });
-
-    document.getElementById('max-button').addEventListener("click", event => {
-        window.electron.winMaximize()
-        document.body.classList.add('maximized');
-    });
-
-    document.getElementById('restore-button').addEventListener("click", event => {
-        window.electron.winUnMaximize()
-        document.body.classList.remove('maximized');
-    });
-
-    document.getElementById('close-button').addEventListener("click", event => {
-        window.electron.winClose()
-    });
-
-
     // CHILD-WIN
-    var searchSpan = $(".form-group>span")
-    searchSpan.on("click", () => {
-        let winIndex = 0;
-        if (searchUrl != null) {
-            winIndex = window.electron.childWinOpen(searchUrl) // Requires url
-            searchUrl = null
-        }
-        else {
-            winIndex = window.electron.childWinOpen(window.electron.searchEngineURL) // Requires url
-        }
-        let tabs = document.getElementsByClassName("tabs")[0]
-        let div = document.createElement("div")
-        let icon = document.createElement("img")
-        div.className = "tab"
-        div.id = winIndex
-        icon.height = "10px"
-        if (searchUrl.endsWith("/"))
-            icon.src = searchUrl + "favicon.ico"
-        else
-            icon.src = searchUrl + "/favicon.ico"
-        div.appendChild(icon)
-        tabs.appendChild(div)
-        $(".tab").removeClass("active-tab");
-        $(div).addClass("active-tab");
-        $(div).on("click", () => {
-            window.electron.childWinClose(winIndex) // Requires index of child window in list
-        })
+    var searchSpan = document.querySelector(".form-group>span")
+    var textField = $(".form-field")
+    textField.on('input', function (event) {
+        searchUrl = event.target.value;
     })
+    textField.on('keyup', function (e) {
+        console.log("Pressed key!")
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            console.log("Pressed enter! -> "+searchUrl)
+            if(!searchUrl.includes("/")) searchUrl = window.electron.searchEngineURL+"/"+searchUrl
+            let winIndex = 0;
+            if (searchUrl != null) {
+                winIndex = window.electron.childWinOpen(searchUrl) // Requires url
+                searchUrl = null
+            }
+            else {
+                winIndex = window.electron.childWinOpen(window.electron.searchEngineURL) // Requires url
+            }
+        }
+    });
 }
 
 function showSearchHintOverlay(searchInputText) {
