@@ -6,7 +6,6 @@ const {app, BrowserWindow, screen, ipcMain, ipcRenderer, globalShortcut} = requi
 const path = require('path')
 const TrayHelper = require('./tray-helper')
 let { searchEngineURL } = require('./global-data')
-let { setupTitlebar, attachTitlebarToWindow } = require("custom-electron-titlebar/main");
 
 let bromeWindow;
 let bromeWidth;
@@ -27,12 +26,12 @@ function createChildWindow(url) {
     },
     frame: false
   })
-  attachTitlebarToWindow(childWindow);
   let index = childWindows.length;
   childWindows[index] = childWindow;
 
   // and load the index.html of the app.
   childWindow.loadURL(url)
+  childWindow.webContents.openDevTools({ mode: 'detach' });
   console.log("Created child window at index "+index+": " + url)
   return index;
 }
