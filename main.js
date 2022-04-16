@@ -33,6 +33,7 @@ function createChildWindow(url) {
   childWindow.loadURL(url)
   childWindow.webContents.openDevTools({ mode: 'detach' });
   console.log("Created child window at index "+index+": " + url)
+  bromeWindow.close()
   return index;
 }
 
@@ -49,9 +50,6 @@ app.whenReady().then(() => {
   console.log("Initialising Brome...")
   console.log("Activating shortcut listener...")
   initShortcutListener()
-  console.log("Success!")
-  console.log("Creating title bar...")
-  setupTitlebar();
   console.log("Success!")
 
   console.log("Creating main Brome window...")

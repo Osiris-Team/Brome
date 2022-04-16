@@ -1,105 +1,108 @@
 <html>
 
-<head>
-    <style>
-        brome-overlay-menu {
-            display: flex;
-            position: absolute;
-            height: 0.2cm;
-            width: 1cm;
-            top: 0px;
-            left: calc(50vw - 1cm);
-            background: #00000070;
-            box-shadow: 0px 2px 2px 1px rgb(255 255 255 / 26%);
-            border-bottom-left-radius: 0.2cm;
-            border-bottom-right-radius: 0.2cm;
-            flex-direction: row;
-            align-items: center;
-            align-content: center;
-            gap: 0.1cm;
-            transform-origin: top;
-            transform: scale(1);
-        }
-
-        brome-overlay-menu:hover {
-            -webkit-animation: move_eye 0.1s ease-in 0s;
-            -moz-animation: move_eye 0.1s ease-in 0s;
-            -o-animation: move_eye 0.1s ease-in 0s;
-            animation: move_eye 0.1s ease-in 0s;
-            transform-origin: top;
-            transform: scale(7);
-        }
-        brome-overlay-min-button{
-            display: block;
-            width: 0.1cm;
-            height: 0.1cm;
-            border-radius: 100%;
-            border: 1px solid red;
-            fill: white;
-            visibility: hidden;
-        }
-        brome-overlay-max-button{
-            display: block;
-            width: 0.1cm;
-            height: 0.1cm;
-            border-radius: 100%;
-            border: 1px solid red;
-            fill: white;
-            visibility: hidden;
-        }
-        brome-overlay-restore-button{
-            display: block;
-            width: 0.1cm;
-            height: 0.1cm;
-            border-radius: 100%;
-            border: 1px solid red;
-            fill: white;
-            visibility: hidden;
-        }
-        brome-overlay-close-button{
-            display: block;
-            width: 0.1cm;
-            height: 0.1cm;
-            border-radius: 100%;
-            border: 1px solid red;
-            fill: white;
-            visibility: hidden;
-        }
-
-        @-webkit-keyframes move_eye {
-            from {
-                transform: scale(1);
-            }
-        }
-
-        @-moz-keyframes move_eye {
-            from {
-                transform: scale(1);
-            }
-        }
-
-        @-o-keyframes move_eye {
-            from {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes move_eye {
-            from {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes scaleup {
-            from {
-                transform: scale(1);
-            }
-        }
-    </style>
-</head>
-
 <body>
     <brome-overlay-menu>
+        <style>
+            brome-overlay-menu {
+                display: flex;
+                z-index: 1000000000000;
+                /*
+                width: 100%;
+                height: 0.5cm;
+                background: black;
+                */
+                position: absolute;
+                height: 0.2cm;
+                width: 1cm;
+                top: 0px;
+                left: calc(50vw - 1cm);
+                background: #00000070;
+                box-shadow: 0px 2px 2px 1px rgb(255 255 255 / 26%);
+                border-bottom-left-radius: 0.2cm;
+                border-bottom-right-radius: 0.2cm;
+                flex-direction: row;
+                align-items: center;
+                align-content: center;
+                gap: 0.1cm;
+                transform-origin: top;
+                transform: scale(1);
+            }
+
+            brome-overlay-menu:hover {
+                -webkit-animation: move_eye 0.1s ease-in 0s;
+                -moz-animation: move_eye 0.1s ease-in 0s;
+                -o-animation: move_eye 0.1s ease-in 0s;
+                animation: move_eye 0.1s ease-in 0s;
+                transform-origin: top;
+                transform: scale(7);
+            }
+
+            brome-overlay-min-button {
+                display: block;
+                width: 0.1cm;
+                height: 0.1cm;
+                border-radius: 100%;
+                fill: white;
+                visibility: hidden;
+            }
+
+            brome-overlay-max-button {
+                display: block;
+                width: 0.1cm;
+                height: 0.1cm;
+                border-radius: 100%;
+                fill: white;
+                visibility: hidden;
+            }
+
+            brome-overlay-restore-button {
+                display: block;
+                width: 0.1cm;
+                height: 0.1cm;
+                border-radius: 100%;
+                fill: white;
+                visibility: hidden;
+            }
+
+            brome-overlay-close-button {
+                display: block;
+                width: 0.1cm;
+                height: 0.1cm;
+                border-radius: 100%;
+                fill: white;
+                visibility: hidden;
+            }
+
+            @-webkit-keyframes move_eye {
+                from {
+                    transform: scale(1);
+                }
+            }
+
+            @-moz-keyframes move_eye {
+                from {
+                    transform: scale(1);
+                }
+            }
+
+            @-o-keyframes move_eye {
+                from {
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes move_eye {
+                from {
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes scaleup {
+                from {
+                    transform: scale(1);
+                }
+            }
+        </style>
         <brome-overlay-min-button>
             <svg style="width:100%;height:100%;" width="11" height="1" viewBox="0 0 11 1">
                 <path d="m11 0v1h-11v-1z" stroke-width=".26208" />
@@ -124,50 +127,54 @@
                     stroke-width=".3" />
             </svg>
         </brome-overlay-close-button>
+        <script>
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            let bromeMenu = document.getElementsByTagName('brome-overlay-menu')[0]
+            let bromeMin = document.getElementsByTagName('brome-overlay-min-button')[0]
+            let bromeMax = document.getElementsByTagName('brome-overlay-max-button')[0]
+            let bromeRestore = document.getElementsByTagName('brome-overlay-restore-button')[0]
+            let bromeClose = document.getElementsByTagName('brome-overlay-close-button')[0]
+            let isMaximized = false;
+            bromeMenu.onmouseover = function (event) {
+                bromeMin.style.visibility = "visible";
+                if(isMaximized){
+                  bromeMax.style.visibility = "hidden";
+                  bromeRestore.style.visibility = "visible";
+                } else{
+                  bromeMax.style.visibility = "visible";
+                  bromeRestore.style.visibility = "hidden";
+                }
+                bromeClose.style.visibility = "visible";
+            }
+            bromeMenu.onmouseout = function (event) {
+                bromeMin.style.visibility = "hidden";
+                bromeMax.style.visibility = "hidden";
+                bromeRestore.style.visibility = "hidden";
+                bromeClose.style.visibility = "hidden";
+            }
+
+            // Make minimise/maximise/restore/close buttons work when they are clicked
+            bromeMin.addEventListener("click", event => {
+                window.electron.winMinimize()
+            });
+
+            bromeMax.addEventListener("click", event => {
+                window.electron.winMaximize()
+                document.body.classList.add('maximized');
+            });
+
+            bromeRestore.addEventListener("click", event => {
+                window.electron.winUnMaximize()
+                document.body.classList.remove('maximized');
+            });
+
+            bromeClose.addEventListener("click", event => {
+                window.electron.winClose()
+            });
+        </script>
     </brome-overlay-menu>
-    <script>
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        let bromeMenu = document.getElementsByTagName('brome-overlay-menu')[0]
-        let bromeMin = document.getElementsByTagName('brome-overlay-min-button')[0]
-        let bromeMax = document.getElementsByTagName('brome-overlay-max-button')[0]
-        let bromeRestore = document.getElementsByTagName('brome-overlay-restore-button')[0]
-        let bromeClose = document.getElementsByTagName('brome-overlay-close-button')[0]
-        bromeMenu.onmouseover = function (event) {
-            console.log("We are in bois!")
-            bromeMin.style.visibility = "visible";
-            bromeMax.style.visibility = "visible";
-            bromeRestore.style.visibility = "visible";
-            bromeClose.style.visibility = "visible";
-        }
-        bromeMenu.onmouseout = function (event) {
-            console.log("We are OUT bois!")
-            //bromeMin.style.visibility = "hidden";
-            //bromeMax.style.visibility = "hidden";
-            //bromeRestore.style.visibility = "hidden";
-            //bromeClose.style.visibility = "hidden";
-        }
-
-        // Make minimise/maximise/restore/close buttons work when they are clicked
-        document.getElementById('min-button').addEventListener("click", event => {
-            window.electron.winMinimize()
-        });
-
-        document.getElementById('max-button').addEventListener("click", event => {
-            window.electron.winMaximize()
-            document.body.classList.add('maximized');
-        });
-
-        document.getElementById('restore-button').addEventListener("click", event => {
-            window.electron.winUnMaximize()
-            document.body.classList.remove('maximized');
-        });
-
-        document.getElementById('close-button').addEventListener("click", event => {
-            window.electron.winClose()
-        });
-    </script>
 </body>
 
 </html>
