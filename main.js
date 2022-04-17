@@ -31,7 +31,7 @@ function createChildWindow(url) {
 
   // and load the index.html of the app.
   childWindow.loadURL(url)
-  childWindow.webContents.openDevTools({ mode: 'detach' });
+  //childWindow.webContents.openDevTools({ mode: 'detach' });
   console.log("Created child window at index "+index+": " + url)
   bromeWindow.close()
   return index;
@@ -78,7 +78,7 @@ app.whenReady().then(() => {
   })
   bromeWindow.setAlwaysOnTop(true)
   bromeWindow.loadFile('brome.html')
-  bromeWindow.webContents.openDevTools({ mode: 'detach' });
+  //bromeWindow.webContents.openDevTools({ mode: 'detach' });
 
   console.log("Brome with " + bromeWidth + "px width " + bromeHeight + "px height")
   console.log("Success!")
