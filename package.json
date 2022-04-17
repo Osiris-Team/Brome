@@ -1,6 +1,6 @@
 {
   "name": "Brome",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Chrome but better: Brome.",
   "main": "main.js",
   "scripts": {
@@ -53,6 +53,17 @@
         {
           "name": "@electron-forge/maker-rpm",
           "config": {}
+        }
+      ],
+      "publishers": [
+        {
+          "name": "@electron-forge/publisher-github",
+          "config": {
+            "repository": {
+              "owner": "Osiris-Team",
+              "name": "Brome"
+            }
+          }
         }
       ]
     }
