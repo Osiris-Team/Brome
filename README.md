@@ -1,7 +1,7 @@
 # Brome
 Chrome but better: Brome. The most minimal and private browser, for people that want
 the best browsing experience. Runs on Windows, Mac and Linux (+ distros). 
-Download the latest release from [here](TODO).
+Download the latest release from [here](https://github.com/Osiris-Team/Brome/releases/latest).
 
 ### Motivation
 - Chrome is good, but I find myself having more than 100 tabs opened after using chrome for
