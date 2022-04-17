@@ -4,6 +4,7 @@
   "description": "Chrome but better: Brome.",
   "main": "main.js",
   "scripts": {
+    "publish": "electron-forge publish",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
