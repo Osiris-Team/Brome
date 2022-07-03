@@ -8,6 +8,7 @@ const TrayHelper = require('./tray-helper')
 let { searchEngineURL } = require('./global-data')
 
 let bromeWindow;
+let bromeControlsOverlayWindow;
 let bromeWidth;
 let bromeHeight;
 let screenWidth, screenHeight;
@@ -37,27 +38,19 @@ function createChildWindow(url) {
   return index;
 }
 
-function initShortcutListener(){
-  globalShortcut.register('CommandOrControl+Shift+B', () => {
-    bromeWindow.show()
-  })
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   console.log("Initialising Brome...")
-  console.log("Activating shortcut listener...")
-  initShortcutListener()
-  console.log("Success!")
 
-  console.log("Creating main Brome window...")
+  // FETCH WIDTH AND HEIGHT
   const primaryDisplay = screen.getPrimaryDisplay()
   const { width, height } = primaryDisplay.workAreaSize
   screenWidth = width
   screenHeight = height
-  // Create the browser window.
+
+  // CREATE MAIN BROME WINDOW
   bromeHeight = parseInt(height / 100 * 20, 10);// to get 20% of the screen height: height / 100 * 2 // parseInt because double not supported
   bromeWidth = parseInt(width / 100 * 40, 10);// to get 40% of the screen width
   bromeWindow = new BrowserWindow({
@@ -79,15 +72,42 @@ app.whenReady().then(() => {
   bromeWindow.setAlwaysOnTop(true)
   bromeWindow.loadFile('brome.html')
   //bromeWindow.webContents.openDevTools({ mode: 'detach' });
+  console.log("Created main Brome window with " + bromeWidth + "px width " + bromeHeight + "px height.")
 
-  console.log("Brome with " + bromeWidth + "px width " + bromeHeight + "px height")
-  console.log("Success!")
+  // CREATE BROME OVERLAY WINDOW
+  bromeControlsOverlayWindow = new BrowserWindow({
+    width: width,
+    height: height / 100 * 5, // 5% of max height
+    x: 0,
+    y: 10,
+    frame: false,
+    backgroundColor: '#00FFFFFF',
+    transparent: true
+  })
+  bromeControlsOverlayWindow.on('closed', function (event) {
+    bromeControlsOverlayWindow.hide();
+  });
+  bromeControlsOverlayWindow.setAlwaysOnTop(true)
+  bromeControlsOverlayWindow.loadFile('brome.html')
 
-  // ICON TRAY
+  // SET ICON TRAY
   TrayHelper.setOptions({
     trayIconPath: path.join("Brome_icon.png"),
     window: bromeWindow
   });
+
+  // REGISTER LISTENERS (always at end after all objects were initialized)
+  globalShortcut.register('CommandOrControl+Shift+B', () => {
+    bromeWindow.show()
+  })
+  app.on('browser-window-focus', (event, win) => {
+    bromeControlsOverlayWindow.show()
+  })
+  app.on('browser-window-blur', (event, win) => {
+    bromeControlsOverlayWindow.close()
+  })
+  console.log("Registered listeners.")
+
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
