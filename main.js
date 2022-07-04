@@ -2,15 +2,14 @@ try {
   require('electron-reloader')(module)
 } catch (_) {}
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, screen, ipcMain, ipcRenderer, globalShortcut} = require('electron')
+const {app, Menu, Tray, BrowserWindow, screen, ipcMain, ipcRenderer, globalShortcut} = require('electron')
 const path = require('path')
-const TrayHelper = require('./tray-helper')
 let { searchEngineURL } = require('./global-data')
 
-let bromeWindow;
-let bromeControlsOverlayWindow;
-let bromeWidth;
-let bromeHeight;
+let tray;
+let winMain;
+let winMainWidth;
+let winMainHeight;
 let screenWidth, screenHeight;
 let childWindows = [];
 
@@ -21,11 +20,9 @@ function createChildWindow(url) {
   let childWindow = new BrowserWindow({
     width: screenWidth,
     height: screenHeight,
-    backgroundColor: '#FFF',
-    webPreferences: {
-      preload: path.join(__dirname, 'child-preload.js'),
-    },
-    frame: false
+    backgroundColor: '#000000',
+    frame: false,
+    show: true
   })
   let index = childWindows.length;
   childWindows[index] = childWindow;
@@ -34,7 +31,6 @@ function createChildWindow(url) {
   childWindow.loadURL(url)
   //childWindow.webContents.openDevTools({ mode: 'detach' });
   console.log("Created child window at index "+index+": " + url)
-  bromeWindow.close()
   return index;
 }
 
@@ -44,6 +40,15 @@ function createChildWindow(url) {
 app.whenReady().then(() => {
   console.log("Initialising Brome...")
 
+  // CREATE TRAY
+  tray = new Tray(path.join("assets/Brome_icon.png"))
+  tray.setToolTip('Brome')
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: 'Exit', click: () => {
+      app.quit()
+    }}
+  ]))
+
   // FETCH WIDTH AND HEIGHT
   const primaryDisplay = screen.getPrimaryDisplay()
   const { width, height } = primaryDisplay.workAreaSize
@@ -51,67 +56,44 @@ app.whenReady().then(() => {
   screenHeight = height
 
   // CREATE MAIN BROME WINDOW
-  bromeHeight = parseInt(height / 100 * 20, 10);// to get 20% of the screen height: height / 100 * 2 // parseInt because double not supported
-  bromeWidth = parseInt(width / 100 * 40, 10);// to get 40% of the screen width
-  bromeWindow = new BrowserWindow({
-    width: bromeWidth,
-    height: bromeHeight, 
-    maxWidth: bromeWidth,
-    maxHeight: bromeHeight,
-    minWidth: bromeWidth,
-    minHeight: bromeHeight,
-    x: parseInt((primaryDisplay.size.width / 2) - (bromeWidth / 2)),
-    y: parseInt((primaryDisplay.size.height / 2) - (bromeHeight / 2)),
+  winMainHeight = parseInt(height / 100 * 5, 10);// to get 5% of the screen height: height / 100 * 2 // parseInt because double not supported
+  winMainWidth = parseInt(width / 100 * 5, 10);// to get 5% of the screen width
+  
+    // CREATE MAIN BROME WINDOW
+  winMain = new BrowserWindow({
+    width: winMainWidth,
+    height: winMainHeight, 
+    maxWidth: winMainWidth,
+    maxHeight: winMainHeight,
+    minWidth: winMainWidth,
+    minHeight: winMainHeight,
+    x: parseInt((primaryDisplay.size.width / 2) - (winMainWidth / 2)),
+    y: 0,
     frame: false,
     backgroundColor: '#00FFFFFF',
     webPreferences: {
-      preload: path.join(__dirname, 'brome-preload.js'),
+      preload: path.join(__dirname, 'child-preload.js'),
     },
-    transparent: true
+    transparent: true,
+    resizable: false,
+    movable: false
   })
-  bromeWindow.setAlwaysOnTop(true)
-  bromeWindow.loadFile('brome.html')
+  winMain.setAlwaysOnTop(true)
+  winMain.loadFile('brome.html')
+  winMain.show()
   //bromeWindow.webContents.openDevTools({ mode: 'detach' });
-  console.log("Created main Brome window with " + bromeWidth + "px width " + bromeHeight + "px height.")
-
-  // CREATE BROME OVERLAY WINDOW
-  bromeControlsOverlayWindow = new BrowserWindow({
-    width: width,
-    height: height / 100 * 5, // 5% of max height
-    x: 0,
-    y: 10,
-    frame: false,
-    backgroundColor: '#00FFFFFF',
-    transparent: true
-  })
-  bromeControlsOverlayWindow.on('closed', function (event) {
-    bromeControlsOverlayWindow.hide();
-  });
-  bromeControlsOverlayWindow.setAlwaysOnTop(true)
-  bromeControlsOverlayWindow.loadFile('brome.html')
-
-  // SET ICON TRAY
-  TrayHelper.setOptions({
-    trayIconPath: path.join("Brome_icon.png"),
-    window: bromeWindow
-  });
+  console.log("Created main Brome window with " + winMainWidth + "px width " + winMainHeight + "px height.")
 
   // REGISTER LISTENERS (always at end after all objects were initialized)
   globalShortcut.register('CommandOrControl+Shift+B', () => {
-    bromeWindow.show()
-  })
-  app.on('browser-window-focus', (event, win) => {
-    bromeControlsOverlayWindow.show()
-  })
-  app.on('browser-window-blur', (event, win) => {
-    bromeControlsOverlayWindow.close()
+    winMain.show()
   })
   console.log("Registered listeners.")
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) bromeWindow.show()
+    if (BrowserWindow.getAllWindows().length === 0) winMain.show()
   })
 })
 
@@ -125,16 +107,16 @@ app.on('window-all-closed', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on("win-minimize", (event, args) => {
-  bromeWindow.minimize()
+  winMain.minimize()
 });
 ipcMain.on("win-maximize", (event, args) => {
-  bromeWindow.maximize()
+  winMain.maximize()
 });
 ipcMain.on("win-unmaximize", (event, args) => {
-  bromeWindow.unmaximize()
+  winMain.unmaximize()
 });
 ipcMain.on("win-close", (event, args) => {
-  bromeWindow.close()
+  winMain.close()
 });
 
 // Child window events
