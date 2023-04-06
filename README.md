@@ -14,6 +14,11 @@ website content. Thats why Brome has the smallest top bar possible and runs in t
 Brome is always accessible via the shortcut CRTL/COMMAND + SHIFT + B or by clicking the Brome icon in the system tray.
 It also auto-fills your search bar with the previously copied text.
 
+## Todo
+- Since each website you visit gets treated as an app and has its own window
+you can benefit from the window manager of your operating system.
+Brome will save all the window locations/sizes and restore them on your next boot.
+
 ### Contribute
 After cloning this repo, open a terminal in the repo root directory and enter `npm install` and then
 `npm run start` to build and launch Brome with latest code.
